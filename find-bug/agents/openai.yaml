@@ -1,0 +1,4 @@
+interface:
+  display_name: "找bug"
+  short_description: "定位一个可复现 P0/P1 bug across server/client"
+  default_prompt: "Use $find-bug to find one reproducible P0/P1 bug across server or client code, then ask how to handle it."

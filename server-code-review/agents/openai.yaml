@@ -1,4 +1,0 @@
-interface:
-  display_name: "后端服务器代码审查"
-  short_description: "审查后端服务器生产风险并发数据一致性部署和测试缺口"
-  default_prompt: "使用 $server-code-review 审查这次后端服务器改动的正确性、回归、并发、数据一致性、RPC/API 契约、配置、部署风险和缺失测试。"

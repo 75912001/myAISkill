@@ -1,4 +1,0 @@
-interface:
-  display_name: "Deploy"
-  short_description: "Server项目Docker与bin本地部署流程指南"
-  default_prompt: "Use $deploy to handle Docker deployment or local bin deployment for the current server repository."

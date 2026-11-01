@@ -1,0 +1,71 @@
+---
+name: sa-server-generate-pb
+description: sa server protobuf Go 文件生成技能。用于在修改 proto/*.proto 后重新生成 proto/pb Go 文件, 或当用户说生成 pb, 生成协议, 生成 pb.go, 更新 proto/pb, 运行 python gen.py 时使用。
+---
+
+# sa server Generate PB
+
+## 核心规则
+
+使用仓库根目录的 `gen.py` 作为唯一协议生成入口。不要手工修改生成的 `proto/pb/*.pb.go` 来修补生成结果; 如果生成结果不对, 修改源 `.proto` 或生成器, 然后重新生成。
+
+`gen.py` 会执行这些工作:
+
+- 扫描 `proto/*.proto`。
+- 根据消息前的 `//0xHEX#方向#描述` 注释生成 `*.cmd.proto`。
+- 调用 `protoc` 生成普通 protobuf Go 文件。
+- 对 `*.grpc.proto` 调用 `go-grpc` 和 `go-grpc-x` 生成服务桩代码。
+- 输出到 `proto/pb/`。
+
+## 执行流程
+
+1. 解析 server 仓库根目录。
+   - 如果当前工作区包含 `gen.py` 和 `proto/`, 优先使用当前工作区。
+   - 否则执行 `git rev-parse --show-toplevel`。
+   - 如果 Git 报 `dubious ownership`, 使用 `git -c safe.directory=<repo-path> rev-parse --show-toplevel`。
+
+2. 在执行会写文件的命令前检查生成输入。
+   - 确认仓库根目录存在 `gen.py`。
+   - 确认仓库根目录存在 `proto/`。
+   - 如果用户刚修改协议契约, 先阅读相关 `.proto` 文件, 检查字段编号、enum 删除、注释、`package` 和 `go_package` 是否一致。
+
+3. 在仓库根目录通过 Git Bash 运行生成:
+
+```bash
+python gen.py
+```
+
+4. 格式化生成的 Go 文件:
+
+```bash
+gofmt -w proto/pb
+```
+
+5. 按影响范围验证。
+   - 纯生成的最小验证:
+
+```bash
+go test ./proto/pb
+```
+
+   - 如果协议变更影响 `online`、`gateway`、`cache` 或 `login` 行为, 同时运行受影响服务测试。较大的协议契约变更优先运行:
+
+```bash
+go test ./online ./gateway ./cache ./login ./tool/robot/main ./proto/pb
+```
+
+6. 汇报重新生成了什么, 以及哪些检查通过或失败。
+
+## 失败处理
+
+- 如果缺少 `protoc`、`go`、`xlib` 或 `protoc-gen-go-grpc-x`, 直接暴露生成器错误, 不要手工创建替代的生成文件。
+- 如果生成导致无关 `.pb.go` 文件变化, 先检查 `*.cmd.proto` 或源 proto 顺序是否变化, 不要直接假定变化安全。
+- 如果验证失败, 优先根据第一个编译或测试错误回查源 `.proto` 和生成 API 名称。
+- 除非用户明确要求, 生成协议后不要清 cache、重启服务或部署。
+
+## 项目说明
+
+- `gen.py` 通过 `go list -m -f {{.Dir}} github.com/75912001/xlib` 定位 `xlib`。
+- 生成过程依赖 `xlib/grpc/proto/options.proto`、`xlib/thirdparty` 和当前平台的 `protoc-gen-go-grpc-x` 二进制。
+- `proto/account.cmd.proto` 等 `*.cmd.proto` 是生成文件, 但在同一次运行中会作为后续 `protoc` 的输入。
+- 生成文件位于 `proto/pb/`; 业务代码应导入并使用该包, 不要重复定义协议结构。

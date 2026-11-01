@@ -1,0 +1,4 @@
+interface:
+  display_name: "🟢[已发布] SA / 客户端 / 同步与检查"
+  short_description: "按请求同步客户端共享配置或协议并生成 PB, 或执行 Godot 无错误无警告检查"
+  default_prompt: "使用 $sa-desktop-sync-check 执行本次指定的客户端共享配置同步、协议同步及 PB 生成或 Godot 检查, 不复制编辑器差异化导出的配置, 不扩大子任务范围."

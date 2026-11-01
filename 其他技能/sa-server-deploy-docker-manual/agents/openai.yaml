@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 服务端 / Docker 手动部署"
+  short_description: "按 README 清理并本地重建四个业务服务的 1 号实例, 验证部署结果"
+  default_prompt: "使用 $sa-server-deploy-docker-manual 清理旧日志、容器和镜像, 再从本地源码构建并部署全部服务的 1 号实例."

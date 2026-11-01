@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 角色 / 动作帧采集"
+  short_description: "采集角色 104 个动作并更新角色配置, 只读校验正式四字段帧元数据"
+  default_prompt: "使用 $sa-character-extract-animation-frames 提取指定角色动画序号, 写入角色帧配置并只读校验正式四字段帧元数据."

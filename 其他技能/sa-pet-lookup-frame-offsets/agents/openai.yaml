@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 资源 / 帧偏移查询"
+  short_description: "查询独立 frameid 偏移并核对已有四字段元数据, 不补写缺失记录"
+  default_prompt: "使用 $sa-pet-lookup-frame-offsets 查询指定 frameid 的图片偏移并校验 server/docs/offset.yaml."

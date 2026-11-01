@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 角色骑宠 / 图集发布"
+  short_description: "预览或批量发布角色骑宠图集, 校验共享与颜色专属命名及帧偏移"
+  default_prompt: "Use $sa-character-mount-publish-sprite-sheet to preview or publish validated character mount sprite sheets."

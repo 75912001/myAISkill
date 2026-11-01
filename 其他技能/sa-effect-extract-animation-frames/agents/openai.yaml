@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 特效 / 当前动作采集"
+  short_description: "采集当前动作的帧号和偏移, 保持动作号不变并只读校验正式元数据"
+  default_prompt: "使用 $sa-effect-extract-animation-frames 操作资源提取器, 提取指定动画序号当前动作的全部帧偏移并校验正式帧元数据."

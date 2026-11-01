@@ -1,0 +1,4 @@
+interface:
+  display_name: "🟢 [已发布] sa.搜索原版逻辑"
+  short_description: "检索原版客户端与服务端证据, 分析资源及行为并明确事实和推断边界"
+  default_prompt: "使用 $sa-search-resources 只读检索原版客户端和服务端证据, 分析指定资源或行为, 明确事实、推断和证据缺口."

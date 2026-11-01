@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 资源 / BMP 转透明 PNG"
+  short_description: "递归转换指定目录的 BMP, 校验 PNG 后移除源图, 不覆盖冲突文件"
+  default_prompt: "使用 $sa-bmp-to-png 递归转换指定文件夹内的全部 BMP 文件为 PNG, 并在成功后移除 BMP。"

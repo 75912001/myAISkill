@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 宠物 / 动作帧采集"
+  short_description: "采集宠物八方向共 56 个动作, 生成独立配置并只读校验正式帧元数据"
+  default_prompt: "使用 $sa-pet-extract-animation-frames 操作资源提取器, 提取指定动画序号并生成 sprite YAML 并校验正式帧元数据."

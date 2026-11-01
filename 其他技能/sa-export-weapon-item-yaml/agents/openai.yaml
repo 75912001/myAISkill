@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 配置 / 武器目录与导出"
+  short_description: "通过 Godot 武器目录编辑或校验数据, 按明确请求导出已发布配置"
+  default_prompt: "使用 $sa-export-weapon-item-yaml 完成本次指定的武器目录编辑、校验或导出, 仅在明确要求时生成运行配置或同步客户端."

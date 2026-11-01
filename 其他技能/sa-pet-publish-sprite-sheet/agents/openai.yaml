@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 宠物 / 图集发布"
+  short_description: "使用已打开的 TexturePacker 发布宠物图集, 验证输出并清空列表"
+  default_prompt: "使用 $sa-pet-publish-sprite-sheet 发布指定宠物精灵文件夹, 并展示全部输出文件."

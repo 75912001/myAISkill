@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 基础 / TexturePacker 发布"
+  short_description: "供资源类 Skill 复用的 TexturePacker GUI 发布与输出验证基础能力"
+  default_prompt: "使用 $sa-texturepacker-core 按明确的源目录和输出目录执行基础图集发布, 检查退出码与输出文件."

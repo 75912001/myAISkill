@@ -1,0 +1,4 @@
+interface:
+  display_name: "SA / 服务端 / Go PB 生成"
+  short_description: "使用服务端正式生成入口更新 Go 协议代码, 按受影响范围运行验证"
+  default_prompt: "使用 $sa-server-generate-pb 重新生成 sa server 仓库的 proto/pb Go 文件。"

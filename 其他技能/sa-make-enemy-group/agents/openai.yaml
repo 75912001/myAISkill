@@ -1,0 +1,6 @@
+interface:
+  display_name: "SA 原版敌人组录入"
+  short_description: "检索原版敌人资料, 确认后按正式规则直接发布YAML"
+  default_prompt: "Use $sa-make-enemy-group to find an original SA enemy group from my clue, let me confirm the enemies and names, then publish its YAML through the project's existing validation and serialization rules."
+policy:
+  allow_implicit_invocation: true

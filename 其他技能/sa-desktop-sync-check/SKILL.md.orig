@@ -1,0 +1,115 @@
+---
+name: sa-desktop-build-check
+description: sa.desktop Godot 桌面客户端同步和编译检查技能。用于处理同步 pb、同步配置、生成 pb、运行 Godot headless 编译检查并确认无错误无警告, 或当用户说同步客户端协议、同步 server 配置、运行 cp.proto.from.server.and.gen.sh、运行 cp.config.from.server.sh、检查或编译 sa.desktop 客户端时使用。
+---
+
+# sa.desktop Build Check
+
+## 基本原则
+
+使用本技能处理 `sa.desktop` Godot 客户端的协议、配置和编译检查流程。优先复用仓库已有脚本, 不额外维护第二套复制或生成逻辑。
+
+所有命令使用 Git Bash 执行。涉及安装 Godot、联网拉依赖、修改系统 PATH、清理生成文件或覆盖用户改动时, 先征求用户确认。
+
+解析客户端根目录:
+
+1. 如果当前目录包含 `project.godot`、`cp.proto.from.server.and.gen.sh` 和 `cp.config.from.server.sh`, 使用当前目录。
+2. 否则执行 `git rev-parse --show-toplevel` 并检查这些文件是否存在。
+3. 如果当前目录不是 `sa.desktop` 仓库, 先询问用户客户端项目路径。
+
+不要手工修改 `proto/sa.pb.gd` 来修补生成结果; 如果生成结果不对, 修改 server 源协议、Godobuf 生成器或 `cp.proto.from.server.and.gen.sh`, 然后重新生成。不要手工复制配置表来绕过 `cp.config.from.server.sh`; 如果配置内容不对, 优先修改 server/config 源数据后重新同步。
+
+## 入口脚本
+
+- `./cp.config.from.server.sh`: 从 `SERVER_CONFIG_DIR` 指向的 server `config/` 单向同步支持的 YAML 配置到客户端 `config/`。默认源目录是 `D:/src/github.com/sa.project/server/config`。
+- `./cp.proto.from.server.and.gen.sh`: 先从 `SERVER_PROTO_DIR` 指向的 server `proto/` 单向同步共享协议, 再通过 Godot headless + Godobuf 生成 `proto/sa.pb.gd`。默认源目录是 `D:/src/github.com/sa.project/server/proto`。
+- 本 skill 不负责导出 Windows 客户端; `export_presets.cfg`、`sa.exe` 和 `sa.pck` 不属于本 skill 的验证目标。
+
+## 推荐完整流程
+
+先检查工作区状态, 明确哪些变更是用户已有改动:
+
+```bash
+git status --short
+```
+
+同步配置:
+
+```bash
+./cp.config.from.server.sh
+```
+
+同步协议并生成客户端 pb:
+
+```bash
+./cp.proto.from.server.and.gen.sh
+```
+
+编译检查客户端:
+
+```bash
+GODOT_BIN="${GODOT_BIN:-Godot}"
+"$GODOT_BIN" --headless --editor --path . --quit 2>&1 | tee godot-check.log
+```
+
+检查 `godot-check.log` 和命令退出码; 任何 error 或 warning 都按失败处理。
+
+如果 Git Bash 找不到 Godot, 优先使用 `GODOT_BIN` 指向 console 版本:
+
+```bash
+GODOT_BIN=/path/to/Godot_v4.6.3-stable_win64_console.exe ./cp.proto.from.server.and.gen.sh
+/path/to/Godot_v4.6.3-stable_win64_console.exe --headless --editor --path . --quit 2>&1 | tee godot-check.log
+```
+
+如果 server 侧 `.proto` 刚改过, 先在 server 仓库运行服务端协议生成, 再回到客户端执行 `./cp.proto.from.server.and.gen.sh`:
+
+```bash
+python gen.py
+```
+
+## 分任务处理
+
+同步配置:
+
+1. 确认 `SERVER_CONFIG_DIR` 存在, 或让用户给出 server/config 路径。
+2. 在客户端根目录运行 `./cp.config.from.server.sh`。
+3. 检查 `git status --short config` 中的变更是否符合预期。
+
+同步 pb 或生成 pb:
+
+1. 确认 `SERVER_PROTO_DIR` 存在, 或让用户给出 server/proto 路径。
+2. 如果用户只说“同步 pb”, 说明当前项目的客户端入口是 `./cp.proto.from.server.and.gen.sh`, 它会同步协议源并生成 `proto/sa.pb.gd`, 推荐直接运行完整生成以保持 `GPB` 可用。
+3. 运行 `./cp.proto.from.server.and.gen.sh`。
+4. 检查 `proto/sa.pb.gd` 文件头仍包含 `class_name PB` 和 `extends Node`。
+
+编译检查客户端:
+
+1. 确认 `project.godot` 存在。
+2. 优先使用 `GODOT_BIN` 或 PATH 中的 Godot console 可执行文件。
+3. 运行 `--headless --editor --path . --quit`, 建议保存完整输出到 `godot-check.log`。
+4. 检查 Godot 退出码和输出; 任何 error 或 warning 都按失败处理, 不导出 Windows 产物。
+
+## 验证与汇报
+
+完成后至少汇报:
+
+- 运行了哪些命令。
+- 同步或生成了哪些文件。
+- Godot 编译检查是否无错误、无警告。
+- 哪些检查通过, 哪些因为缺少 Godot、server 源目录或权限而无法执行。
+
+常用检查:
+
+```bash
+git status --short
+sed -n '1,5p' proto/sa.pb.gd
+awk 'tolower($0) ~ /(^|[[:space:]])(error|warning)[:[:space:]]/ { print }' godot-check.log
+```
+
+## 失败处理
+
+- 缺少 `SERVER_CONFIG_DIR` 或 `SERVER_PROTO_DIR` 时, 直接暴露路径错误, 不从其他目录猜测源数据。
+- 缺少 Godot 时, 说明无法本地生成或编译检查, 不手工创建空的 pb 文件或伪造编译结果。
+- `./cp.proto.from.server.and.gen.sh` 失败时, 优先查看 Godot/Godobuf 的第一个错误, 回查 server 源协议和客户端 `proto/sa.proto` import。
+- `./cp.config.from.server.sh` 后配置校验失败时, 优先修正 server/config 源配置, 再同步到客户端。
+- 如果生成或同步导致大量无关差异, 先检查 server 源目录和工作区已有改动, 不擅自回滚用户改动。

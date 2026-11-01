@@ -1,0 +1,4 @@
+interface:
+  display_name: "🟢 [已发布] SA / 资源 / 同目录图集打包"
+  short_description: "将 frameid PNG 打包到源目录并注入已有偏移, 缺失元数据时停止"
+  default_prompt: "使用 $sa-make-texturepacker-sprite-sheet 将指定 frameid PNG 目录打包为同目录图集, 注入已有偏移, 缺失正式元数据时停止."
